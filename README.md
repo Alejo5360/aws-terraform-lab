@@ -2,7 +2,7 @@
 
 A hands-on DevOps lab for designing, provisioning, validating, and tearing down AWS infrastructure with Terraform. The goal is to build a reproducible environment and document the reasoning behind its networking, access controls, state management, and cost decisions.
 
-> **Status: Planning.** This repository currently contains documentation only. No infrastructure has been deployed by this project.
+> **Status: Design baseline documented.** The repository contains design documents and an offline cost calculator. Terraform implementation and deployment are still pending; no infrastructure has been deployed by this project.
 
 ## What this project will demonstrate
 
@@ -14,6 +14,15 @@ A hands-on DevOps lab for designing, provisioning, validating, and tearing down 
 
 The project follows **Spec → Plan → Build → Test → Review**. Each phase should produce something that can be inspected and explained.
 
+## Design documents
+
+- [Cost review and operating limits](docs/cost-review.md)
+- [Architecture baseline and decisions](docs/architecture.md)
+- [Verified Ohio pricing snapshot](docs/pricing-us-east-2.json)
+- [Offline cost calculator](scripts/estimate_costs.py)
+
+The 2026-11-06 review estimates **$0.43 in metered usage for 20 practice hours per month** when the workload is destroyed after each session, including a conservative 1 GB paid-egress allowance. The goal remains **$0 out of pocket while the project stays FREE / ACTIVE with sufficient credits**. See the cost review for assumptions and exclusions; this is not a spending guarantee.
+
 ## Project constraints
 
 | Area | Decision |
@@ -21,7 +30,7 @@ The project follows **Spec → Plan → Build → Test → Review**. Each phase 
 | AWS Region | `us-east-2` (Ohio) |
 | Environment | One temporary `dev` environment |
 | Spending | Zero out-of-pocket AWS spending |
-| Deployment | Paused until scope and cost coverage are verified |
+| Deployment | Pending explicit implementation / deployment authorization and a fresh cost preflight |
 | Repository | Private during initial development |
 | Documentation | English |
 
@@ -29,12 +38,14 @@ The spending requirement is a design constraint, not a claim that the proposed s
 
 Do not upgrade the AWS project to a paid plan or activate paid features as part of this lab. Adjust the architecture if it cannot meet the spending requirement.
 
-## Proposed architecture
+## Architecture baseline
 
-The initial design is a small, single-Availability-Zone lab. It remains a proposal until the cost review is complete.
+The cost-reviewed baseline is a small, single-Availability-Zone lab. These resources are planned, not deployed.
 
 - A dedicated VPC with one public subnet, an Internet Gateway, and a route table.
-- One Linux EC2 instance running Nginx and a simple demonstration page.
+- One Linux x86_64 t3.micro in standard CPU-credit mode, running Nginx and a simple demonstration page.
+- One encrypted 8 GiB gp3 root volume with baseline performance and deletion on termination.
+- One auto-assigned public IPv4 address; no separate Elastic IP allocation.
 - A Security Group that restricts HTTP access to the operator's IP.
 - Administrative access through AWS Systems Manager Session Manager.
 - An IAM role for the instance, with permissions limited to its required tasks.
@@ -46,10 +57,10 @@ flowchart LR
     Terraform["Terraform"]
     State["S3 remote state"]
 
-    subgraph AWS["AWS · us-east-2 · proposed"]
+    subgraph AWS["AWS · us-east-2 · design only"]
         subgraph VPC["Dedicated VPC"]
             subgraph Subnet["Public subnet · one Availability Zone"]
-                EC2["EC2 · Linux + Nginx"]
+                EC2["t3.micro · Linux + Nginx"]
             end
             IGW["Internet Gateway"]
         end
@@ -70,15 +81,15 @@ High availability, load balancing, databases, Kubernetes, and a production appli
 
 | Phase | Deliverable | Status |
 | --- | --- | --- |
-| 1. Specify | Scope, spending constraints, and acceptance criteria | In progress |
-| 2. Design | Reviewed architecture, cost estimate, and decision records | Planned |
+| 1. Specify | Scope, spending constraints, and acceptance criteria | Documented |
+| 2. Design | Reviewed architecture, cost estimate, and decision records | Baseline documented |
 | 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Planned |
 | 4. Manage state | Separate backend bootstrap and recovery procedure | Planned |
 | 5. Implement | Parameterized networking, IAM, compute, and instance configuration | Planned |
 | 6. Validate | Local and CI checks, deployment verification, and reproducibility evidence | Planned |
 | 7. Review and clean up | Teardown evidence, final documentation, and reproducible demonstration | Planned |
 
-**Next milestone:** confirm which parts of the proposed architecture meet the spending requirement, then finalize the scope and diagram.
+**Next milestone:** prepare the repository layout, pin tool/provider versions, and document the backend bootstrap. A future deployment must recheck the live plan, credits, Region, and expiry before apply.
 
 ## Acceptance criteria
 

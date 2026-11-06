@@ -1,0 +1,24 @@
+{
+  "review_date": "2026-11-06",
+  "resource_region": "us-east-2",
+  "currency": "USD",
+  "source": "AWS Price List GetProducts API",
+  "pricing_api_region": "us-east-1",
+  "rates": {
+    "t3_micro_hour": {"value": "0.0104", "sku": "J8F5Q9BVHKTDD4YC", "service": "AmazonEC2", "usage_type": "USE2-BoxUsage:t3.micro", "effective_date": "2026-11-01", "conditions": "Linux, Shared, NA preinstalled software, Used capacity, OnDemand"},
+    "t4g_micro_hour": {"value": "0.0084", "sku": "G3K35SU8Y96XCQPJ", "service": "AmazonEC2", "usage_type": "USE2-BoxUsage:t4g.micro", "effective_date": "2026-11-01", "conditions": "Linux, Shared, NA preinstalled software, Used capacity, OnDemand"},
+    "gp3_gb_month": {"value": "0.08", "sku": "M6UGCCQ3CDJQAA37", "service": "AmazonEC2", "usage_type": "USE2-EBS:VolumeUsage.gp3", "effective_date": "2026-11-01"},
+    "public_ipv4_hour": {"value": "0.005", "sku": "8HFJK44D9234XNWA", "service": "AmazonVPC", "usage_type": "USE2-PublicIPv4:InUseAddress", "effective_date": "2026-11-01"},
+    "s3_standard_gb_month": {"value": "0.023", "sku": "YPGKVRB2EKTVDJDT", "service": "AmazonS3", "usage_type": "USE2-TimedStorage-ByteHrs", "effective_date": "2026-10-01", "conditions": "First storage tier: 0 to 51200 GB-month"},
+    "s3_tier1_request": {"value": "0.000005", "sku": "GJKK9PMSTKPNGZS9", "service": "AmazonS3", "usage_type": "USE2-Requests-Tier1", "effective_date": "2026-10-01"},
+    "s3_tier2_request": {"value": "0.0000004", "sku": "DJEKB32FV4HNZJZY", "service": "AmazonS3", "usage_type": "USE2-Requests-Tier2", "effective_date": "2026-10-01"},
+    "internet_egress_gb": {"value": "0.09", "sku": "36H7S3NU9B7S3UT5", "service": "AWSDataTransfer", "conditions": "US East (Ohio) to External, AWS Outbound, first 10 TB beyond global free transfer allowance"}
+  },
+  "pricing_pages": {
+    "compute_and_transfer": "https://aws.amazon.com/ec2/pricing/on-demand/",
+    "ebs": "https://aws.amazon.com/ebs/pricing/",
+    "ipv4": "https://aws.amazon.com/vpc/pricing/",
+    "s3": "https://aws.amazon.com/s3/pricing/",
+    "session_manager": "https://aws.amazon.com/systems-manager/pricing/"
+  }
+}
