@@ -1,6 +1,6 @@
 # Architecture baseline for v1
 
-**Decision date:** 2026-11-06. **State:** design selected after the [cost review](cost-review.md); implementation and deployment remain pending.
+**Decision date:** 2026-11-06. **State:** design selected after the [cost review](cost-review.md); provider scaffolds are prepared, while AWS resource implementation and deployment remain pending.
 
 ## Purpose and boundary
 
@@ -86,6 +86,6 @@ A normal workload teardown must preserve the backend used to track it. Do not ex
 6. Verify a disposable two-client state-locking test serializes writes; never force-unlock an active operation.
 7. Destroy the workload when authorized, confirm no lab instance / disk / public address remains, and account for the retained backend.
 
-Before coding, choose a VPC CIDR that does not overlap any connected network and confirm the operator's source /32. During implementation, review permissions and quotas; type availability and published service support do not guarantee launch capacity.
+Before workload implementation, choose a VPC CIDR that does not overlap any connected network and confirm the operator's source /32. During implementation, review permissions and quotas; type availability and published service support do not guarantee launch capacity.
 
 For state locking and recovery details, use [HashiCorp's S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3). See the [cost review](cost-review.md) for the operating envelope. These documents are design artifacts, not evidence of a deployed system.

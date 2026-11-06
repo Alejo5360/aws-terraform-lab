@@ -2,7 +2,7 @@
 
 A hands-on DevOps lab for designing, provisioning, validating, and tearing down AWS infrastructure with Terraform. The goal is to build a reproducible environment and document the reasoning behind its networking, access controls, state management, and cost decisions.
 
-> **Status: Design baseline documented.** The repository contains design documents and an offline cost calculator. Terraform implementation and deployment are still pending; no infrastructure has been deployed by this project.
+> **Status: Local scaffold prepared.** The repository contains design documents, an offline cost calculator, and Terraform provider scaffolds with pinned dependencies. AWS resource implementation and deployment are still pending; no infrastructure has been deployed by this project.
 
 ## What this project will demonstrate
 
@@ -18,6 +18,7 @@ The project follows **Spec → Plan → Build → Test → Review**. Each phase 
 
 - [Cost review and operating limits](docs/cost-review.md)
 - [Architecture baseline and decisions](docs/architecture.md)
+- [Local development, repository layout, and pinned versions](docs/local-development.md)
 - [Verified Ohio pricing snapshot](docs/pricing-us-east-2.json)
 - [Offline cost calculator](scripts/estimate_costs.py)
 
@@ -83,13 +84,19 @@ High availability, load balancing, databases, Kubernetes, and a production appli
 | --- | --- | --- |
 | 1. Specify | Scope, spending constraints, and acceptance criteria | Documented |
 | 2. Design | Reviewed architecture, cost estimate, and decision records | Baseline documented |
-| 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Planned |
+| 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Prepared and locally validated |
 | 4. Manage state | Separate backend bootstrap and recovery procedure | Planned |
 | 5. Implement | Parameterized networking, IAM, compute, and instance configuration | Planned |
 | 6. Validate | Local and CI checks, deployment verification, and reproducibility evidence | Planned |
 | 7. Review and clean up | Teardown evidence, final documentation, and reproducible demonstration | Planned |
 
-**Next milestone:** prepare the repository layout, pin tool/provider versions, and document the backend bootstrap. A future deployment must recheck the live plan, credits, Region, and expiry before apply.
+**Next milestone:** define the protected bootstrap state location and implement the S3 backend with recovery and migration instructions. A future deployment must recheck the live plan, credits, Region, and expiry before apply and obtain deployment authorization.
+
+## Local preparation
+
+Terraform **1.17.1** and the **hashicorp/aws 6.72.0** provider are pinned. Separate roots live in `infra/bootstrap` and `infra/environments/dev`; neither contains resources or data sources yet. The dev S3 backend is a partial declaration, not a configured or existing bucket.
+
+For local-only checks, use `fmt`, `init -backend=false`, and `validate` from [the development guide](docs/local-development.md). The provider lock files cover Windows AMD64 and Linux AMD64. Actual execution has been checked on Windows; Linux hashes are prepared for later CI.
 
 ## Acceptance criteria
 
@@ -109,7 +116,7 @@ The completed lab should satisfy all of the following:
 
 Never commit AWS credentials, access tokens, login caches, Terraform state, saved plan files, or configuration containing secrets. Treat outputs and screenshots as potentially sensitive before adding them to the repository.
 
-Future automation should validate changes before deployment. CI checks, infrastructure code, and deployment commands will be added in later phases; none are available yet.
+Future automation should validate changes before deployment. Provider scaffolds and local validation instructions are available now. AWS resource definitions, CI workflows, and deployment commands will be added in later phases.
 
 ## Planned portfolio evidence
 

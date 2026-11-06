@@ -1,0 +1,8 @@
+# Template only. The backend bucket does not exist yet.
+# Actual backend configuration is local and excluded from Git.
+bucket       = "REPLACE_WITH_BOOTSTRAPPED_BUCKET"
+key          = "dev/terraform.tfstate"
+region       = "us-east-2"
+profile      = "devops-free"
+encrypt      = true
+use_lockfile = true

@@ -1,0 +1,55 @@
+# Terraform caches and local backend metadata
+**/.terraform/
+
+# Terraform state and locks must stay outside this repository
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# Saved plans can contain secrets
+*.tfplan
+*.tfplan.*
+*.plan
+*.plan.json
+plan.json
+
+# Local inputs and backend configuration; examples are safe to commit
+*.tfvars
+*.tfvars.json
+*.tfbackend
+!*.tfvars.example
+!*.tfvars.json.example
+!*.tfbackend.example
+
+# Local credentials and tools
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.setup/
+.tools/
+credentials.tfrc.json
+.terraformrc
+terraform.rc
+*.pem
+*.key
+
+# Overrides and crash logs
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+crash.log
+crash.*.log
+
+# Python and editor artifacts
+__pycache__/
+*.py[cod]
+.venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Commit each .terraform.lock.hcl; it is not a state file or secret.

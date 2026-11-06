@@ -76,4 +76,4 @@ After each future session, review the workload destroy plan, destroy the lab res
 
 AWS budgets and alerts are notifications, not a general-purpose guaranteed kill switch. No budget, alert, scheduler, Cost Explorer query, or deployment was created during this review.
 
-The immediate next phase is repository preparation and version pinning. Infrastructure implementation and any apply remain separate steps.
+Repository preparation and version pinning are recorded in [the local-development guide](local-development.md). The next milestone is the protected bootstrap state and backend procedure. AWS resource implementation and any apply remain separate steps.
