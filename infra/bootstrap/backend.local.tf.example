@@ -1,0 +1,8 @@
+# Recovery/re-bootstrap template only. Replacing the active backend requires review.
+# Override both paths with the external configuration from prepare-bootstrap.ps1.
+terraform {
+  backend "local" {
+    path          = "../../../.local-state/aws-terraform-lab/bootstrap/terraform.tfstate"
+    workspace_dir = "../../../.local-state/aws-terraform-lab/bootstrap/workspaces"
+  }
+}

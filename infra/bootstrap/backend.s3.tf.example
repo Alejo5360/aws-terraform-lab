@@ -1,5 +1,5 @@
-# Replace backend.tf with this file only during the documented migration.
-# This .example file is not loaded by Terraform.
+# S3 declaration template for the documented migration or reviewed recovery.
+# Actual backend settings are supplied externally, never embedded in source.
 terraform {
   backend "s3" {}
 }
