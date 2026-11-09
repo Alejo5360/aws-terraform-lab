@@ -76,4 +76,4 @@ After each future session, review the workload destroy plan, destroy the lab res
 
 AWS budgets and alerts are notifications, not a general-purpose guaranteed kill switch. No budget, alert, scheduler, Cost Explorer query, or deployment was created during this review.
 
-Repository preparation and version pinning are recorded in [the local-development guide](local-development.md). The next milestone is the protected bootstrap state and backend procedure. AWS resource implementation and any apply remain separate steps.
+Repository preparation and version pinning are recorded in [the local-development guide](local-development.md). Protected bootstrap code and offline tests were completed on 2026-11-09; see [the bootstrap runbook](bootstrap.md). Live preflight, deployment, and migration remain separate steps. This implementation does not refresh the dated credit balance or price snapshot.

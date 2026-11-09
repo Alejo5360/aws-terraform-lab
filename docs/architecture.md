@@ -1,6 +1,6 @@
 # Architecture baseline for v1
 
-**Decision date:** 2026-11-06. **State:** design selected after the [cost review](cost-review.md); provider scaffolds are prepared, while AWS resource implementation and deployment remain pending.
+**Decision date:** 2026-11-06. **State updated:** 2026-11-09. Design selected after the [cost review](cost-review.md); bootstrap code and offline tests are complete. Workload implementation and all AWS deployment remain pending.
 
 ## Purpose and boundary
 
@@ -62,7 +62,7 @@ The S3 bucket is a regional service outside the VPC. Terraform accesses it from 
 
 ## Separate bootstrap and workload lifecycles
 
-Plan two Terraform root configurations later: bootstrap for the backend and dev for the disposable workload. Keep their state keys separate. Initial bootstrap state must stay in a protected local location outside the repository, then be migrated to the remote backend once it exists. Document the reverse procedure before final backend destruction.
+Two Terraform roots are prepared: bootstrap for the backend and dev for the disposable workload. Bootstrap code is implemented; dev remains a scaffold. Their state keys are separate. Initial bootstrap state stays in a protected local location outside the repository, then migrates to the remote backend once it exists. The [bootstrap runbook](bootstrap.md) documents preparation, migration, recovery, and reverse migration before final backend destruction. These procedures have not been exercised against AWS.
 
 A normal workload teardown must preserve the backend used to track it. Do not expire current state automatically or delete all bucket versions during a practice-session cleanup. Version retention and any final deletion require a deliberate recovery and cleanup procedure.
 

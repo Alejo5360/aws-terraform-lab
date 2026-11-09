@@ -2,7 +2,7 @@
 
 A hands-on DevOps lab for designing, provisioning, validating, and tearing down AWS infrastructure with Terraform. The goal is to build a reproducible environment and document the reasoning behind its networking, access controls, state management, and cost decisions.
 
-> **Status: Local scaffold prepared.** The repository contains design documents, an offline cost calculator, and Terraform provider scaffolds with pinned dependencies. AWS resource implementation and deployment are still pending; no infrastructure has been deployed by this project.
+> **Status: State bootstrap implemented and locally tested.** The repository contains the protected S3 backend configuration, an external-state preparation helper, recovery instructions, and pinned Terraform dependencies. The dev workload remains a scaffold. No infrastructure has been deployed by this project.
 
 ## What this project will demonstrate
 
@@ -19,6 +19,7 @@ The project follows **Spec → Plan → Build → Test → Review**. Each phase 
 - [Cost review and operating limits](docs/cost-review.md)
 - [Architecture baseline and decisions](docs/architecture.md)
 - [Local development, repository layout, and pinned versions](docs/local-development.md)
+- [State bootstrap, migration, recovery, and final cleanup](docs/bootstrap.md)
 - [Verified Ohio pricing snapshot](docs/pricing-us-east-2.json)
 - [Offline cost calculator](scripts/estimate_costs.py)
 
@@ -31,7 +32,7 @@ The 2026-11-06 review estimates **$0.43 in metered usage for 20 practice hours p
 | AWS Region | `us-east-2` (Ohio) |
 | Environment | One temporary `dev` environment |
 | Spending | Zero out-of-pocket AWS spending |
-| Deployment | Pending explicit implementation / deployment authorization and a fresh cost preflight |
+| Deployment | Pending explicit deployment authorization and a fresh cost preflight |
 | Repository | Private during initial development |
 | Documentation | English |
 
@@ -85,18 +86,18 @@ High availability, load balancing, databases, Kubernetes, and a production appli
 | 1. Specify | Scope, spending constraints, and acceptance criteria | Documented |
 | 2. Design | Reviewed architecture, cost estimate, and decision records | Baseline documented |
 | 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Prepared and locally validated |
-| 4. Manage state | Separate backend bootstrap and recovery procedure | Planned |
+| 4. Manage state | Separate backend bootstrap and recovery procedure | Code and offline tests complete; deployment pending |
 | 5. Implement | Parameterized networking, IAM, compute, and instance configuration | Planned |
 | 6. Validate | Local and CI checks, deployment verification, and reproducibility evidence | Planned |
 | 7. Review and clean up | Teardown evidence, final documentation, and reproducible demonstration | Planned |
 
-**Next milestone:** define the protected bootstrap state location and implement the S3 backend with recovery and migration instructions. A future deployment must recheck the live plan, credits, Region, and expiry before apply and obtain deployment authorization.
+**Next milestone:** authorize and review the live bootstrap preflight and plan, then provision and migrate state only after approval. Recheck the live plan, credits, Region, and expiry before deployment. Workload implementation remains a later step.
 
 ## Local preparation
 
-Terraform **1.17.1** and the **hashicorp/aws 6.72.0** provider are pinned. Separate roots live in `infra/bootstrap` and `infra/environments/dev`; neither contains resources or data sources yet. The dev S3 backend is a partial declaration, not a configured or existing bucket.
+Terraform **1.17.1** and the **hashicorp/aws 6.72.0** provider are pinned. Separate roots live in `infra/bootstrap` and `infra/environments/dev`. Bootstrap defines one S3 bucket with five configuration/policy resources and requires an explicit project identity. Its initial local backend stays outside the checkout. The dev root still has no resources, and its S3 backend remains a partial declaration.
 
-For local-only checks, use `fmt`, `init -backend=false`, and `validate` from [the development guide](docs/local-development.md). The provider lock files cover Windows AMD64 and Linux AMD64. Actual execution has been checked on Windows; Linux hashes are prepared for later CI.
+For local-only checks, use `fmt`, `init -backend=false`, `validate`, the six mocked Terraform tests, and the eight helper tests from [the development guide](docs/local-development.md). The provider lock files cover Windows AMD64 and Linux AMD64. Actual execution has been checked on Windows; Linux hashes are prepared for later CI.
 
 ## Acceptance criteria
 
@@ -116,7 +117,7 @@ The completed lab should satisfy all of the following:
 
 Never commit AWS credentials, access tokens, login caches, Terraform state, saved plan files, or configuration containing secrets. Treat outputs and screenshots as potentially sensitive before adding them to the repository.
 
-Future automation should validate changes before deployment. Provider scaffolds and local validation instructions are available now. AWS resource definitions, CI workflows, and deployment commands will be added in later phases.
+Future automation should validate changes before deployment. Bootstrap resource definitions and local checks are available now. The runbook documents future deployment commands; executing them needs separate authorization. Workload definitions and CI workflows remain later phases.
 
 ## Planned portfolio evidence
 

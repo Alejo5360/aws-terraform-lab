@@ -1,9 +1,9 @@
-# Backend bootstrap scaffold
+# Protected state bootstrap
 
-This root will manage the S3 state backend in us-east-2. It currently defines only version requirements, provider configuration, and local inputs. **It contains no resources, data sources, or backend configuration.**
+This root implements the S3 state bucket in `us-east-2`. **It has been validated locally with mocked AWS operations; it has not been deployed.** The `dev` workload remains a separate scaffold.
 
-Use only the preparation commands in [the local-development guide](../../docs/local-development.md). In this milestone, initialization must use `-backend=false`, followed by `validate`.
+The configuration enables versioning, SSE-S3 encryption, blocked public access, disabled ACLs, a transport-security policy, and bucket deletion guards. Backend outputs define separate `bootstrap` and `dev` keys with S3 native locking. No DynamoDB table or custom KMS key is needed.
 
-Before adding the first bootstrap resource, explicitly configure a local backend with an absolute protected state path outside the checkout. Never rely on Terraform's implicit local-state default. Once the bucket exists, migrate bootstrap state to a dedicated remote key. The dev workload must use a different key. That implementation and migration are a later milestone.
+Initial state uses an explicit local backend outside the checkout. Prefer [the preparation helper](../../scripts/prepare-bootstrap.ps1), which generates absolute external paths and required project inputs without contacting AWS or creating state. The checked-in relative fallback also points outside the checkout; review filesystem access before using it.
 
-Do not run a plan or apply against this scaffold. A passing validate checks configuration structure; it does not create a bucket or verify AWS authorization. Final backend cleanup must be separate from normal workload teardown.
+Follow [the bootstrap runbook](../../docs/bootstrap.md) for the future cost preflight, provisioning review, migration, recovery, and separate final cleanup. Those operations need their own authorization. For checks that require no AWS login, see [local development](../../docs/local-development.md).
