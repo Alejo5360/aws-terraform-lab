@@ -2,6 +2,8 @@
 
 **Implementation date: 2026-11-09. Status: code and offline validation complete; no AWS deployment or remote-state migration performed.** Commands below that contact AWS or change state describe future, separately authorized operations. They are not part of the local checks.
 
+**Live planning update:** the [2026-11-09 preflight and plan review](bootstrap-plan-review.md) passed. A saved plan exists in the private external directory; it has not been applied. The provisioning and migration sections remain procedures requiring their own authorization.
+
 ## Ownership and protections
 
 `infra/bootstrap` owns one durable S3 bucket and five configuration/policy resources. `infra/environments/dev` will own the disposable workload. A routine workload teardown must preserve the bucket and both state histories.

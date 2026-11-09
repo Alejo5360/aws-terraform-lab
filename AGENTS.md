@@ -3,9 +3,9 @@
 - Explain steps and decisions clearly; the user's preferred guidance level is HIGH.
 - The AWS profile is devops-free and the only resource Region is us-east-2.
 - Preserve the zero-out-of-pocket requirement. Never upgrade the AWS project to PAID, activate advanced features, buy commitments, or add paid features to make a step work.
-- The current milestone authorizes bootstrap resource code, external-state preparation, local validation, and tests using a fully mocked AWS provider. It does not authorize live plans, AWS resource creation, backend migration, apply, destroy, import, refresh, or state-changing operations against AWS.
+- The current milestone authorizes bootstrap resource code, external-state preparation, local checks, mocked tests, read-only AWS preflight, and the reviewed live bootstrap plan. AWS resource creation, backend migration, apply, destroy, import, refresh, and state-changing operations against AWS still need separate authorization.
 - Never place credentials, tokens, login caches, Terraform state, or saved plans in the checkout. Ignoring state in Git is not a substitute for keeping actual state outside the repository.
-- Use init -backend=false for normal local validation. A local-backend-only smoke check may initialize isolated metadata outside the checkout without contacting AWS or writing resource state. prepare-bootstrap.ps1 generates absolute external paths; do not create real state or saved plans inside the checkout. The dev S3 backend is still not configured.
+- Use init -backend=false for normal local validation. Bootstrap live planning uses its explicit local backend and a private external TF_DATA_DIR, input file, and saved plan. prepare-bootstrap.ps1 generates absolute external paths; never create real state or saved plans inside the checkout. The dev S3 backend is still not configured.
 - Keep bootstrap and dev as separate Terraform roots and state lifecycles. Workload cleanup must not delete the backend that tracks it.
 - Keep Terraform and AWS provider versions pinned; commit .terraform.lock.hcl in both roots. Update pins and lock files together after review.
 - Use fmt, validate, mocked Terraform tests, and helper tests for this milestone. They do not prove live IAM permissions, service quotas, credit coverage, or launch capacity.

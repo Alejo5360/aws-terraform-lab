@@ -2,7 +2,7 @@
 
 A hands-on DevOps lab for designing, provisioning, validating, and tearing down AWS infrastructure with Terraform. The goal is to build a reproducible environment and document the reasoning behind its networking, access controls, state management, and cost decisions.
 
-> **Status: State bootstrap implemented and locally tested.** The repository contains the protected S3 backend configuration, an external-state preparation helper, recovery instructions, and pinned Terraform dependencies. The dev workload remains a scaffold. No infrastructure has been deployed by this project.
+> **Status: State bootstrap implemented; live plan reviewed.** Local tests passed, and the 2026-11-09 live plan proposes six S3 creations with no modifications or deletions. Deployment is awaiting authorization. The dev workload remains a scaffold. No infrastructure has been deployed by this project.
 
 ## What this project will demonstrate
 
@@ -20,6 +20,7 @@ The project follows **Spec → Plan → Build → Test → Review**. Each phase 
 - [Architecture baseline and decisions](docs/architecture.md)
 - [Local development, repository layout, and pinned versions](docs/local-development.md)
 - [State bootstrap, migration, recovery, and final cleanup](docs/bootstrap.md)
+- [Live bootstrap preflight and plan review](docs/bootstrap-plan-review.md)
 - [Verified Ohio pricing snapshot](docs/pricing-us-east-2.json)
 - [Offline cost calculator](scripts/estimate_costs.py)
 
@@ -86,12 +87,12 @@ High availability, load balancing, databases, Kubernetes, and a production appli
 | 1. Specify | Scope, spending constraints, and acceptance criteria | Documented |
 | 2. Design | Reviewed architecture, cost estimate, and decision records | Baseline documented |
 | 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Prepared and locally validated |
-| 4. Manage state | Separate backend bootstrap and recovery procedure | Code and offline tests complete; deployment pending |
+| 4. Manage state | Separate backend bootstrap and recovery procedure | Code, offline tests, and live plan review complete; deployment pending |
 | 5. Implement | Parameterized networking, IAM, compute, and instance configuration | Planned |
 | 6. Validate | Local and CI checks, deployment verification, and reproducibility evidence | Planned |
 | 7. Review and clean up | Teardown evidence, final documentation, and reproducible demonstration | Planned |
 
-**Next milestone:** authorize and review the live bootstrap preflight and plan, then provision and migrate state only after approval. Recheck the live plan, credits, Region, and expiry before deployment. Workload implementation remains a later step.
+**Next milestone:** authorize creation from the reviewed bootstrap plan. Recheck the live plan, credits, Region, and expiry before deployment. State migration and workload implementation remain separate steps.
 
 ## Local preparation
 
