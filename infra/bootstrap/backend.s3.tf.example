@@ -1,0 +1,5 @@
+# Replace backend.tf with this file only during the documented migration.
+# This .example file is not loaded by Terraform.
+terraform {
+  backend "s3" {}
+}

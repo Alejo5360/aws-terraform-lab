@@ -1,3 +1,14 @@
+variable "expected_account_id" {
+  description = "Expected 12-digit AWS project identifier. Supply it through an external local inputs file."
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.expected_account_id))
+    error_message = "expected_account_id must contain exactly 12 digits."
+  }
+}
+
 variable "aws_region" {
   description = "The selected AWS project Region. Regional resources must remain in Ohio."
   type        = string

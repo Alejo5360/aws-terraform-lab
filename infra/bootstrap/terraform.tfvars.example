@@ -1,2 +1,5 @@
 aws_region  = "us-east-2"
 aws_profile = "devops-free"
+
+# Documentation fixture only; replace using your external inputs file.
+expected_account_id = "123456789012"

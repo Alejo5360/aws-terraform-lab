@@ -17,9 +17,11 @@ plan.json
 *.tfvars
 *.tfvars.json
 *.tfbackend
+*.tfbackend.json
 !*.tfvars.example
 !*.tfvars.json.example
 !*.tfbackend.example
+!*.tfbackend.json.example
 
 # Local credentials and tools
 .env
