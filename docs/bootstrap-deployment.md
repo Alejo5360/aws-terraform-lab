@@ -1,6 +1,6 @@
 # Bootstrap creation and live verification
 
-**Date:** 2026-11-09. **Status:** S3 creation complete; authoritative bootstrap state remains in the protected external local backend. Remote-state migration and workload implementation are pending.
+**Date:** 2026-11-09. **Status at the end of creation:** authoritative bootstrap state was in the protected external local backend. **Subsequent update:** the user separately authorized retention and [migration to S3](bootstrap-state-migration.md), which is now complete. Workload implementation remains pending. This document preserves the creation evidence.
 
 ## Authorization and pre-apply checks
 
@@ -32,11 +32,11 @@ A second live Terraform plan completed with detailed exit code **0** and reporte
 
 ## State and recovery artifacts
 
-Terraform state tracks all six managed resources under `<user-profile>/.local/state/aws-terraform-lab/bootstrap/terraform.tfstate`. This external local file is currently authoritative; the bucket does not yet host this project's remote Terraform state.
+At the end of creation, Terraform state tracked all six managed resources under `<user-profile>/.local/state/aws-terraform-lab/bootstrap/terraform.tfstate`. That external file was authoritative before the later migration; it is now a recovery artifact and must not be used as a parallel writer.
 
 An external post-apply backup was copied and verified by SHA-256. The private creation receipt records the timestamp and live checks. Actual project identifiers, bucket name, state, backup, generated configurations, and saved plan remain outside the checkout.
 
-The actual outputs were exported locally as `bootstrap.s3.tfbackend.json` and `dev.s3.tfbackend.json`, with distinct keys, encryption, native locking, and expected-project guards. Preparing those files did not initialize an S3 backend or migrate state. Backend source remains `local`.
+The actual outputs were exported locally as `bootstrap.s3.tfbackend.json` and `dev.s3.tfbackend.json`, with distinct keys, encryption, native locking, and expected-project guards. Preparing those files did not itself initialize an S3 backend or migrate state. Backend source remained `local` until the separately authorized migration.
 
 The original creation plan has been used and must not be applied again. Preserve protected recovery artifacts while needed and follow the reviewed retention procedure rather than committing or casually deleting them.
 
@@ -44,6 +44,6 @@ The original creation plan has been used and must not be applied again. Preserve
 
 The retained bucket consumes storage/request allowances or credits, including all retained object versions. The [verified estimate](bootstrap-plan-review.md#metered-usage-estimate) remains USD 0.0113 per month under the documented envelope, before allowances/credits and excluding additional charge dimensions. It is not a spending cap or a guarantee of an unchanged credit balance; billing data can lag.
 
-Decide whether to retain the backend for the next milestone or review separate cleanup. Retaining it for the lab is the expected next step. Migrating authoritative state to `bootstrap/terraform.tfstate` requires explicit authorization and the [migration procedure](bootstrap.md#4-migrate-bootstrap-state-to-s3), including backup, controlled copy, remote verification, and a separate source-change commit.
+The user subsequently chose retention and authorized migration to `bootstrap/terraform.tfstate`; see [the migration record](bootstrap-state-migration.md). Final cleanup still needs separate approval and the [reviewed procedure](bootstrap.md#6-final-backend-cleanup).
 
-No live locking-contention drill, version-recovery drill, state migration, workload deployment, or teardown has been performed. Those remain future milestones.
+At the end of creation, no state migration had been performed. Migration and normal native locking have since been verified; deliberate lock contention, version recovery, workload deployment, and teardown remain future milestones.

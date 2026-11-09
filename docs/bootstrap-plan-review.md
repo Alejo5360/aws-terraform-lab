@@ -2,7 +2,7 @@
 
 **Reviewed:** 2026-11-09 at 14:01 UTC. **Result:** ready for deployment approval; no resources created and no state migration performed.
 
-**Subsequent milestone:** the user later authorized creation, which completed successfully. See [the creation record](bootstrap-deployment.md). The statements below describe the pre-apply review; the original saved plan has now been used. State migration remains pending.
+**Subsequent milestones:** the user later authorized successful [creation](bootstrap-deployment.md) and [state migration to S3](bootstrap-state-migration.md). The statements below describe the pre-apply review; the original saved plan has now been used. S3 is now authoritative.
 
 ## Scope and evidence
 

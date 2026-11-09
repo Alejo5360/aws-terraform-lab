@@ -1,6 +1,6 @@
 # Architecture baseline for v1
 
-**Decision date:** 2026-11-06. **State updated:** 2026-11-09. Design selected after the [cost review](cost-review.md); the S3 bootstrap is created and [verified live](bootstrap-deployment.md). Remote-state migration and workload implementation/deployment remain pending.
+**Decision date:** 2026-11-06. **State updated:** 2026-11-09. Design selected after the [cost review](cost-review.md); the S3 bootstrap is created, [verified live](bootstrap-deployment.md), and [holds authoritative state](bootstrap-state-migration.md). Workload implementation/deployment remain pending.
 
 ## Purpose and boundary
 
@@ -62,7 +62,7 @@ The S3 bucket is a regional service outside the VPC. Terraform accesses it from 
 
 ## Separate bootstrap and workload lifecycles
 
-Two Terraform roots are prepared: bootstrap for the backend and dev for the disposable workload. Bootstrap has been applied and verified; dev remains a scaffold. Their state keys are separate. Bootstrap state currently stays in a protected local location outside the repository, with a verified external backup. Migration to S3 remains pending. The [bootstrap runbook](bootstrap.md) documents preparation, migration, recovery, and reverse migration before final backend destruction. Migration, live locking drills, recovery, and final teardown have not yet been exercised against AWS.
+Two Terraform roots are prepared: bootstrap for the backend and dev for the disposable workload. Bootstrap has been applied and verified; dev remains a scaffold. Their state keys are separate. Bootstrap state is now authoritative in S3, with protected pre-migration and downloaded remote snapshots outside the repository. The [bootstrap runbook](bootstrap.md) documents preparation, migration, recovery, and reverse migration before final backend destruction. Normal native lock-file creation/release was observed during migration and planning; deliberate contention testing, recovery, and final teardown remain unperformed.
 
 A normal workload teardown must preserve the backend used to track it. Do not expire current state automatically or delete all bucket versions during a practice-session cleanup. Version retention and any final deletion require a deliberate recovery and cleanup procedure.
 

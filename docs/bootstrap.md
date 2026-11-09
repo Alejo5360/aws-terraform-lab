@@ -1,8 +1,8 @@
 # Bootstrap, state migration, and recovery
 
-**Implementation date: 2026-11-09. Current status: S3 creation authorized, completed, and verified; remote-state migration pending.** Commands below describe procedures, not an instruction to repeat completed operations. AWS changes require authorization for the corresponding milestone.
+**Implementation date: 2026-11-09. Current status: S3 creation and state migration authorized, completed, and verified.** Commands below describe procedures, not an instruction to repeat completed operations. AWS changes require authorization for the corresponding milestone.
 
-**Live update:** the [preflight and plan review](bootstrap-plan-review.md) passed, followed by the explicitly authorized [creation and live verification](bootstrap-deployment.md). The saved creation plan has already been used; do not apply it again. Authoritative state and a verified backup remain outside the checkout in the local backend. Migration requires a separate decision.
+**Live update:** the [preflight and plan review](bootstrap-plan-review.md), authorized [creation](bootstrap-deployment.md), and authorized [migration](bootstrap-state-migration.md) passed. Authoritative state is now in S3 at `bootstrap/terraform.tfstate`. Protected local snapshots are recovery artifacts only. Do not apply the used creation plan again or reconnect the old local state as an independent writer.
 
 ## Ownership and protections
 
@@ -11,7 +11,7 @@
 | Setting | Implementation and purpose |
 | --- | --- |
 | Project / Region | Required `expected_account_id`, provider `allowed_account_ids`, identity precondition, and `us-east-2` validation |
-| Bucket name | `aws-terraform-lab-tfstate-<project-id>-us-east-2`; availability still needs a live check |
+| Bucket name | `aws-terraform-lab-tfstate-<project-id>-us-east-2`; use the verified external output for this existing bucket |
 | Public access | All four S3 Block Public Access settings enabled |
 | Ownership | `BucketOwnerEnforced`; ACLs disabled |
 | Encryption | SSE-S3 (`AES256`), with SSE-C uploads blocked; no custom KMS key |
@@ -23,7 +23,30 @@
 
 `prevent_destroy` is a Terraform configuration guard, not an AWS deletion-deny policy. Removing the resource configuration can remove that guard. `force_destroy = false` prevents Terraform from emptying a non-empty bucket automatically. Neither replaces backups or careful access control.
 
-The initial state uses a local backend. The checked-in fallback points to `../../../.local-state/aws-terraform-lab/bootstrap/terraform.tfstate`, resolved from the bootstrap root, outside the checkout. The helper below supplies absolute paths in a private user-profile directory instead. Never rely on Terraform's implicit in-repository state location.
+Initial provisioning uses a local backend; the migration switches the active declaration to S3. The recovery template `infra/bootstrap/backend.local.tf.example` has a fallback at `../../../.local-state/aws-terraform-lab/bootstrap/terraform.tfstate`, outside the checkout when resolved from the bootstrap root. The helper supplies absolute paths in a private user-profile directory instead. Never rely on Terraform's implicit in-repository state location or replace the active S3 backend casually.
+
+## Connect a fresh checkout after migration
+
+Use this procedure only after remote state has been verified authoritative. Obtain the verified external `bootstrap.s3.tfbackend.json` and `bootstrap.inputs.tfvars.json` from the operator's protected artifacts. Do not put either into Git or reconstruct the bucket name from the documentation fixture. Use a new external metadata directory so an unrelated initialized backend cannot be silently repointed.
+
+```powershell
+$stateDirectory = Join-Path ([Environment]::GetFolderPath('UserProfile')) '.local/state/aws-terraform-lab/bootstrap'
+$backendConfig = Join-Path $stateDirectory 'bootstrap.s3.tfbackend.json'
+$inputsFile = Join-Path $stateDirectory 'bootstrap.inputs.tfvars.json'
+$env:TF_DATA_DIR = Join-Path $stateDirectory 'terraform-data-new-checkout'
+$env:TF_WORKSPACE = 'default'
+if (Test-Path -LiteralPath (Join-Path $env:TF_DATA_DIR 'terraform.tfstate')) {
+    throw 'Choose a new external metadata directory or inspect the existing backend first.'
+}
+$tf = 'terraform'
+& $tf -chdir=infra/bootstrap init "-backend-config=$backendConfig" -input=false -lockfile=readonly
+if ($LASTEXITCODE -ne 0) { throw 'S3 initialization failed; do not fall back to empty local state.' }
+& $tf -chdir=infra/bootstrap state list
+& $tf -chdir=infra/bootstrap plan "-var-file=$inputsFile" -input=false -detailed-exitcode
+if ($LASTEXITCODE -ne 0) { throw 'Expected an unchanged bootstrap; inspect the result before any apply.' }
+```
+
+Verify all six expected managed addresses before planning. Never apply a plan proposing six new creations against the already existing bootstrap: that can mean the client selected an empty state or the wrong key. The helper `prepare-bootstrap.ps1` remains useful for initial local preparation and reviewed recovery; it does not initialize or select the remote backend.
 
 ## 1. Prepare external paths
 
@@ -67,6 +90,8 @@ Use a separate external `TF_DATA_DIR` for every Terraform root. Backend metadata
 ## 2. Future provisioning and review
 
 **Do not execute this section until deployment is authorized and the fresh preflight passes.** Keep `backend.tf` configured as `local` for initial provisioning. Check `terraform workspace show` is `default` before the plan.
+
+This is the initial-creation procedure, not the normal connection procedure for the existing bucket. When starting a separately approved new bootstrap, replace the active declaration with `backend.local.tf.example` before initialization. Do not do that to reconnect to the existing lab. After first enabling bucket versioning, [AWS recommends waiting 15 minutes before object writes](https://docs.aws.amazon.com/AmazonS3/latest/userguide/manage-versioning-examples.html), including state migration and lock-file operations.
 
 ```powershell
 & $tf -chdir=infra/bootstrap init -reconfigure "-backend-config=$($paths.BackendConfig)" -input=false -lockfile=readonly
@@ -129,6 +154,8 @@ if ($LASTEXITCODE -ne 0) { throw "Stop and determine which backend is authoritat
 
 Do not combine `-migrate-state` with `-reconfigure`, use `-force-copy`, or accept an unexplained overwrite. Verify all six managed resource addresses, bucket output, and the remote state's lineage/serial against the protected local backup. Validate remote readability with a fresh external metadata directory initialized to the same S3 configuration; do not run concurrent writes. A subsequent authorized review plan should show no changes.
 
+Compare the full resource data and outputs as well as metadata. Investigate a changed lineage or serial before declaring success; do not edit them to make a comparison pass. In this lab's verified Terraform 1.17.1 migration to an absent default-workspace object, the payload was preserved but remote metadata began a new lineage at serial 1. The [migration record](bootstrap-state-migration.md#metadata-transition) explains the pinned source path and evidence. Serials from different lineages do not form a shared sequence.
+
 Commit only the reviewed backend source switch, for example `chore(bootstrap): migrate bootstrap state to S3`. Never commit state, generated backend files, or metadata. Retain a protected recovery copy of the original local state under the agreed retention policy.
 
 For future `dev` initialization, use its own external metadata directory and `$devS3`. Its partial S3 backend is already declared, with the distinct `dev/terraform.tfstate` key. This does not authorize implementation or deployment of the workload.
@@ -155,11 +182,38 @@ The state bucket outlives normal practice sessions and continues to consume stor
 
 Final removal needs separate approval. First remove the workload through its reviewed teardown and verify no managed workload remains. Inventory both state histories and any consumers. Migrate bootstrap state back to a protected local backend before removing the bucket; verify the local copy is authoritative and preserve the required recovery records externally.
 
+For that separately authorized reverse migration, pause all writers and first export a protected current-state snapshot. Use a **new, empty external local-state directory** so an old pre-migration file cannot silently become authoritative. Keep the current S3-initialized `TF_DATA_DIR`; the new helper result must not replace it during migration.
+
+```powershell
+# Procedure only: requires separate recovery/cleanup authorization.
+# $stateDirectory, $inputsFile, $tf, and the S3-initialized TF_DATA_DIR come
+# from the verified current setup, not from an unrelated checkout.
+$snapshot = & $tf -chdir=infra/bootstrap state pull
+if ($LASTEXITCODE -ne 0) { throw 'Cannot back up authoritative remote state.' }
+$stamp = [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssZ')
+$snapshotFile = Join-Path $stateDirectory "before-reverse-migration-$stamp.tfstate"
+if (Test-Path -LiteralPath $snapshotFile) { throw 'Backup destination already exists.' }
+[IO.File]::WriteAllText($snapshotFile, ($snapshot -join "`n"), [Text.UTF8Encoding]::new($false))
+$projectId = (Get-Content -LiteralPath $inputsFile -Raw | ConvertFrom-Json).expected_account_id
+$recoveryDirectory = Join-Path $stateDirectory "local-recovery-$stamp"
+if (Test-Path -LiteralPath $recoveryDirectory) { throw 'Recovery directory must be new.' }
+$recovery = & ./scripts/prepare-bootstrap.ps1 -ExpectedAccountId $projectId -StateDirectory $recoveryDirectory
+# Preserve a separate source copy before this replacement as well.
+Copy-Item -LiteralPath infra/bootstrap/backend.local.tf.example -Destination infra/bootstrap/backend.tf
+& $tf -chdir=infra/bootstrap init -migrate-state "-backend-config=$($recovery.BackendConfig)" -lockfile=readonly
+if ($LASTEXITCODE -ne 0) { throw 'Stop and establish state authority before retrying.' }
+& $tf -chdir=infra/bootstrap state list
+```
+
+Inspect the prompt and compare the resulting local state's lineage, serial, resource addresses, and IDs with the saved remote snapshot before treating it as authoritative. Keep all remote versions and external backups until the reviewed cleanup explicitly authorizes their deletion. Do not use `-reconfigure` or `-force-copy` as a shortcut, and do not immediately destroy resources after an unverified migration.
+
 Only then review a deliberate change to `prevent_destroy` and a bootstrap destruction plan. Keep `force_destroy = false`. Inspect and approve the exact object versions and delete markers to purge; deleting them is irreversible. Never use an automatic recursive empty-bucket operation or expire state versions as a normal workload cleanup. Verify the bucket is gone and account for every retained local backup afterward.
 
 ## Evidence and references
 
 On 2026-11-09, Windows AMD64 checks passed: Terraform formatting and validation, six native tests with a fully mocked AWS provider, eight external-path/helper tests, and a local-backend initialization using the generated JSON. Backend metadata stayed external; no resource state, saved plan, AWS API call, or AWS resource change was needed. Linux lock hashes are present; Linux execution and live locking/recovery drills remain unverified.
+
+The separately authorized live milestones are recorded in [creation evidence](bootstrap-deployment.md) and [migration evidence](bootstrap-state-migration.md). After switching the backend declaration, validation and all six mocked tests passed again. Independent remote initialization, complete state-payload comparison, encrypted/versioned object checks, native lock activity/release, and a no-change live plan passed. A deliberate concurrent-writer drill and recovery drill remain unperformed.
 
 - [Terraform local backend](https://developer.hashicorp.com/terraform/language/backend/local)
 - [Terraform S3 backend, permissions, native locking, and configuration](https://developer.hashicorp.com/terraform/language/backend/s3)

@@ -2,7 +2,7 @@
 
 A hands-on DevOps lab for designing, provisioning, validating, and tearing down AWS infrastructure with Terraform. The goal is to build a reproducible environment and document the reasoning behind its networking, access controls, state management, and cost decisions.
 
-> **Status: S3 bootstrap created and verified.** The authorized 2026-11-09 apply created the bucket and its five configuration/policy resources. Live security checks passed, and a second plan showed no changes. Bootstrap state remains in the protected external local backend; migration to S3 is pending. The dev workload remains a scaffold.
+> **Status: S3 bootstrap and state migration verified.** The authorized 2026-11-09 creation and migration are complete. S3 now holds authoritative bootstrap state with encryption, versioning, and native locking. An independently initialized client confirmed all six managed resources and a no-change plan. The dev workload remains a scaffold.
 
 ## What this project will demonstrate
 
@@ -22,6 +22,7 @@ The project follows **Spec → Plan → Build → Test → Review**. Each phase 
 - [State bootstrap, migration, recovery, and final cleanup](docs/bootstrap.md)
 - [Live bootstrap preflight and plan review](docs/bootstrap-plan-review.md)
 - [Bootstrap creation and live verification evidence](docs/bootstrap-deployment.md)
+- [State migration, independent verification, and recovery notes](docs/bootstrap-state-migration.md)
 - [Verified Ohio pricing snapshot](docs/pricing-us-east-2.json)
 - [Offline cost calculator](scripts/estimate_costs.py)
 
@@ -34,7 +35,7 @@ The 2026-11-06 review estimates **$0.43 in metered usage for 20 practice hours p
 | AWS Region | `us-east-2` (Ohio) |
 | Environment | One temporary `dev` environment |
 | Spending | Zero out-of-pocket AWS spending |
-| Deployment | S3 bootstrap created after approval and cost preflight; migration and workload remain pending |
+| Deployment | S3 bootstrap created and state migrated after approval and cost preflight; workload pending |
 | Repository | Private during initial development |
 | Documentation | English |
 
@@ -88,16 +89,16 @@ High availability, load balancing, databases, Kubernetes, and a production appli
 | 1. Specify | Scope, spending constraints, and acceptance criteria | Documented |
 | 2. Design | Reviewed architecture, cost estimate, and decision records | Baseline documented |
 | 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Prepared and locally validated |
-| 4. Manage state | Separate backend bootstrap and recovery procedure | Bucket created and verified; remote-state migration pending |
+| 4. Manage state | Separate backend bootstrap and recovery procedure | Created, migrated to S3, and independently verified; recovery procedure documented |
 | 5. Implement | Parameterized networking, IAM, compute, and instance configuration | Planned |
 | 6. Validate | Local and CI checks, deployment verification, and reproducibility evidence | Planned |
 | 7. Review and clean up | Teardown evidence, final documentation, and reproducible demonstration | Planned |
 
-**Next milestone:** decide retention and authorize migration of bootstrap state from the protected local backend to its S3 key. Workload implementation remains a separate step. Continue checking plan status, credits, expiry, and usage while the bucket is retained.
+**Next milestone:** prepare the dev workload, confirming its network range and the operator's source IP before implementation. Workload deployment remains a separate decision. Continue checking plan status, credits, expiry, and usage while retaining the backend.
 
 ## Local preparation
 
-Terraform **1.17.1** and the **hashicorp/aws 6.72.0** provider are pinned. Separate roots live in `infra/bootstrap` and `infra/environments/dev`. Bootstrap defines one S3 bucket with five configuration/policy resources and requires an explicit project identity. Its initial local backend stays outside the checkout. The dev root still has no resources, and its S3 backend remains a partial declaration.
+Terraform **1.17.1** and the **hashicorp/aws 6.72.0** provider are pinned. Separate roots live in `infra/bootstrap` and `infra/environments/dev`. Bootstrap manages one S3 bucket with five configuration/policy resources and requires an explicit project identity. Its active backend is S3; local recovery snapshots and backend metadata remain outside the checkout. The dev root still has no resources, and its S3 backend remains a partial declaration.
 
 For local-only checks, use `fmt`, `init -backend=false`, `validate`, the six mocked Terraform tests, and the eight helper tests from [the development guide](docs/local-development.md). The provider lock files cover Windows AMD64 and Linux AMD64. Actual execution has been checked on Windows; Linux hashes are prepared for later CI.
 
