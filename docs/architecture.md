@@ -1,6 +1,6 @@
 # Architecture baseline for v1
 
-**Decision date:** 2026-11-06. **State updated:** 2026-11-09. Design selected after the [cost review](cost-review.md); bootstrap code and offline tests are complete. Workload implementation and all AWS deployment remain pending.
+**Decision date:** 2026-11-06. **State updated:** 2026-11-09. Design selected after the [cost review](cost-review.md); the S3 bootstrap is created and [verified live](bootstrap-deployment.md). Remote-state migration and workload implementation/deployment remain pending.
 
 ## Purpose and boundary
 
@@ -62,7 +62,7 @@ The S3 bucket is a regional service outside the VPC. Terraform accesses it from 
 
 ## Separate bootstrap and workload lifecycles
 
-Two Terraform roots are prepared: bootstrap for the backend and dev for the disposable workload. Bootstrap code is implemented; dev remains a scaffold. Their state keys are separate. Initial bootstrap state stays in a protected local location outside the repository, then migrates to the remote backend once it exists. The [bootstrap runbook](bootstrap.md) documents preparation, migration, recovery, and reverse migration before final backend destruction. These procedures have not been exercised against AWS.
+Two Terraform roots are prepared: bootstrap for the backend and dev for the disposable workload. Bootstrap has been applied and verified; dev remains a scaffold. Their state keys are separate. Bootstrap state currently stays in a protected local location outside the repository, with a verified external backup. Migration to S3 remains pending. The [bootstrap runbook](bootstrap.md) documents preparation, migration, recovery, and reverse migration before final backend destruction. Migration, live locking drills, recovery, and final teardown have not yet been exercised against AWS.
 
 A normal workload teardown must preserve the backend used to track it. Do not expire current state automatically or delete all bucket versions during a practice-session cleanup. Version retention and any final deletion require a deliberate recovery and cleanup procedure.
 
@@ -88,4 +88,4 @@ A normal workload teardown must preserve the backend used to track it. Do not ex
 
 Before workload implementation, choose a VPC CIDR that does not overlap any connected network and confirm the operator's source /32. During implementation, review permissions and quotas; type availability and published service support do not guarantee launch capacity.
 
-For state locking and recovery details, use [HashiCorp's S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3). See the [cost review](cost-review.md) for the operating envelope. These documents are design artifacts, not evidence of a deployed system.
+For state locking and recovery details, use [HashiCorp's S3 backend documentation](https://developer.hashicorp.com/terraform/language/backend/s3). See the [cost review](cost-review.md) for the operating envelope. The workload architecture remains a design artifact; [the bootstrap creation record](bootstrap-deployment.md) provides evidence for the S3 resources already created.

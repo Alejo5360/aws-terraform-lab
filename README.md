@@ -2,7 +2,7 @@
 
 A hands-on DevOps lab for designing, provisioning, validating, and tearing down AWS infrastructure with Terraform. The goal is to build a reproducible environment and document the reasoning behind its networking, access controls, state management, and cost decisions.
 
-> **Status: State bootstrap implemented; live plan reviewed.** Local tests passed, and the 2026-11-09 live plan proposes six S3 creations with no modifications or deletions. Deployment is awaiting authorization. The dev workload remains a scaffold. No infrastructure has been deployed by this project.
+> **Status: S3 bootstrap created and verified.** The authorized 2026-11-09 apply created the bucket and its five configuration/policy resources. Live security checks passed, and a second plan showed no changes. Bootstrap state remains in the protected external local backend; migration to S3 is pending. The dev workload remains a scaffold.
 
 ## What this project will demonstrate
 
@@ -21,6 +21,7 @@ The project follows **Spec → Plan → Build → Test → Review**. Each phase 
 - [Local development, repository layout, and pinned versions](docs/local-development.md)
 - [State bootstrap, migration, recovery, and final cleanup](docs/bootstrap.md)
 - [Live bootstrap preflight and plan review](docs/bootstrap-plan-review.md)
+- [Bootstrap creation and live verification evidence](docs/bootstrap-deployment.md)
 - [Verified Ohio pricing snapshot](docs/pricing-us-east-2.json)
 - [Offline cost calculator](scripts/estimate_costs.py)
 
@@ -33,7 +34,7 @@ The 2026-11-06 review estimates **$0.43 in metered usage for 20 practice hours p
 | AWS Region | `us-east-2` (Ohio) |
 | Environment | One temporary `dev` environment |
 | Spending | Zero out-of-pocket AWS spending |
-| Deployment | Pending explicit deployment authorization and a fresh cost preflight |
+| Deployment | S3 bootstrap created after approval and cost preflight; migration and workload remain pending |
 | Repository | Private during initial development |
 | Documentation | English |
 
@@ -43,7 +44,7 @@ Do not upgrade the AWS project to a paid plan or activate paid features as part 
 
 ## Architecture baseline
 
-The cost-reviewed baseline is a small, single-Availability-Zone lab. These resources are planned, not deployed.
+The cost-reviewed baseline is a small, single-Availability-Zone lab. The S3 state bucket is now created; the workload resources below remain planned.
 
 - A dedicated VPC with one public subnet, an Internet Gateway, and a route table.
 - One Linux x86_64 t3.micro in standard CPU-credit mode, running Nginx and a simple demonstration page.
@@ -87,12 +88,12 @@ High availability, load balancing, databases, Kubernetes, and a production appli
 | 1. Specify | Scope, spending constraints, and acceptance criteria | Documented |
 | 2. Design | Reviewed architecture, cost estimate, and decision records | Baseline documented |
 | 3. Prepare | Repository structure, pinned tool versions, and authentication guide | Prepared and locally validated |
-| 4. Manage state | Separate backend bootstrap and recovery procedure | Code, offline tests, and live plan review complete; deployment pending |
+| 4. Manage state | Separate backend bootstrap and recovery procedure | Bucket created and verified; remote-state migration pending |
 | 5. Implement | Parameterized networking, IAM, compute, and instance configuration | Planned |
 | 6. Validate | Local and CI checks, deployment verification, and reproducibility evidence | Planned |
 | 7. Review and clean up | Teardown evidence, final documentation, and reproducible demonstration | Planned |
 
-**Next milestone:** authorize creation from the reviewed bootstrap plan. Recheck the live plan, credits, Region, and expiry before deployment. State migration and workload implementation remain separate steps.
+**Next milestone:** decide retention and authorize migration of bootstrap state from the protected local backend to its S3 key. Workload implementation remains a separate step. Continue checking plan status, credits, expiry, and usage while the bucket is retained.
 
 ## Local preparation
 

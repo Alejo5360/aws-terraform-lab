@@ -1,6 +1,6 @@
 # Local development and repository preparation
 
-Prepared on **2026-11-06**, updated **2026-11-09**. Bootstrap resource code and offline tests are now implemented. The dev root remains a scaffold; no AWS resources have been deployed.
+Prepared on **2026-11-06**, updated **2026-11-09**. Bootstrap resource code and offline tests are implemented, and the separately authorized S3 creation has been [verified live](bootstrap-deployment.md). The dev root remains a scaffold. Bootstrap state is still local and external; the checks below remain safe local-only checks.
 
 ## Pinned tools
 
@@ -121,7 +121,7 @@ AWS service work in a later milestone must use the existing temporary-credential
 
 `bootstrap/backend.tf` explicitly declares a local backend with an external fallback path. Prefer absolute external paths from `prepare-bootstrap.ps1`; keep `TF_DATA_DIR` external for provisioning and migration too. See [the runbook](bootstrap.md) for protections and limitations, the required fresh cost/Region preflight, distinct state keys, recovery, and separate final cleanup.
 
-Current authorization covers code and local checks, including fully mocked tests. Do not run live `plan`, `apply`, `destroy`, `import`, `refresh`, backend migration, or state-changing AWS commands under this milestone. Deploying the bootstrap needs separate authorization; dev still needs implementation.
+The authorized bootstrap creation is complete, and read-only bootstrap review plans are available for verification. That approval does not authorize additional applies, `destroy`, `import`, state-changing refresh operations, backend migration, or other AWS changes. Dev still needs implementation. Use the local checks above for routine source validation.
 
 ## Updating dependencies later
 

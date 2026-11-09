@@ -1,8 +1,8 @@
 # Bootstrap, state migration, and recovery
 
-**Implementation date: 2026-11-09. Status: code and offline validation complete; no AWS deployment or remote-state migration performed.** Commands below that contact AWS or change state describe future, separately authorized operations. They are not part of the local checks.
+**Implementation date: 2026-11-09. Current status: S3 creation authorized, completed, and verified; remote-state migration pending.** Commands below describe procedures, not an instruction to repeat completed operations. AWS changes require authorization for the corresponding milestone.
 
-**Live planning update:** the [2026-11-09 preflight and plan review](bootstrap-plan-review.md) passed. A saved plan exists in the private external directory; it has not been applied. The provisioning and migration sections remain procedures requiring their own authorization.
+**Live update:** the [preflight and plan review](bootstrap-plan-review.md) passed, followed by the explicitly authorized [creation and live verification](bootstrap-deployment.md). The saved creation plan has already been used; do not apply it again. Authoritative state and a verified backup remain outside the checkout in the local backend. Migration requires a separate decision.
 
 ## Ownership and protections
 

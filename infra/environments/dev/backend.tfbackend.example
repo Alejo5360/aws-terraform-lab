@@ -1,4 +1,4 @@
-# Template only. The backend bucket does not exist yet.
+# Template only. Use the verified bootstrap output, never this placeholder.
 # Actual backend configuration is local and excluded from Git.
 bucket       = "REPLACE_WITH_BOOTSTRAPPED_BUCKET"
 key          = "dev/terraform.tfstate"

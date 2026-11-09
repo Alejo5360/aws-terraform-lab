@@ -2,6 +2,8 @@
 
 **Reviewed:** 2026-11-09 at 14:01 UTC. **Result:** ready for deployment approval; no resources created and no state migration performed.
 
+**Subsequent milestone:** the user later authorized creation, which completed successfully. See [the creation record](bootstrap-deployment.md). The statements below describe the pre-apply review; the original saved plan has now been used. State migration remains pending.
+
 ## Scope and evidence
 
 The user continued from the completed code milestone to read-only preflight and live planning. The reviewed infrastructure revision is [`958704b`](https://github.com/Alejo5360/aws-terraform-lab/commit/958704b607ab72659001cbe6f6eb54f1021fb941). This report changes documentation and authorization guidance only; it does not alter that infrastructure configuration.
@@ -47,9 +49,9 @@ Inputs, local backend configuration, backend metadata, and the saved plan live u
 
 No resource state file existed after planning. An external private receipt records the review timestamp, source revision, saved-plan SHA-256, action counts, and security checks. Neither that receipt nor the binary plan belongs in Git. The checkout contained no actual state or saved plan.
 
-## Remaining approval and practical limits
+## Approval required at review time and practical limits
 
-The saved plan has **not** been applied. Creation of these resources needs the user's explicit deployment authorization under the agreed milestone boundary. Immediately before applying, confirm the saved-plan hash, unchanged infrastructure configuration, intended identity, active Free plan, credit coverage, expiry, and external backend paths.
+At review time, the saved plan had **not** been applied. Creation required the user's explicit deployment authorization under the agreed milestone boundary, followed by checks of the plan hash, unchanged infrastructure configuration, identity, active Free plan, credit coverage, expiry, and external paths. Those checks and the later authorized apply are recorded in [the creation evidence](bootstrap-deployment.md).
 
 A successful read-only plan does not prove write permissions, guarantee global bucket-name availability, reserve the name, or establish that live creation will succeed. If apply fails, preserve the external state and inspect partial results before retrying. Do not upgrade the project or relax protections to bypass a denial.
 
